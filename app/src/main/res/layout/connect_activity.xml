@@ -9,6 +9,7 @@
         android:id="@+id/statusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Device: not connected"
         android:textSize="18sp" />
 
@@ -17,45 +18,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:backgroundTint="#2E8B8B"
         android:text="Connect to device" />
 
     <TextView
-        android:id="@+id/adcText"
+        android:id="@+id/batteryText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="MQ-3 raw: --"
-        android:textSize="28sp" />
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="Device battery: --"
+        android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/voltText"
+        android:id="@+id/sensorText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="MQ-3 voltage: -- V"
-        android:textSize="20sp" />
+        android:gravity="center"
+        android:text="Sensor: --"
+        android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/bacText"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Estimated BAC: --"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/tempText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Temperature: -- °C"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/humText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Humidity: -- %"
-        android:textSize="20sp" />
+        android:backgroundTint="#2E8B8B"
+        android:enabled="false"
+        android:text="Start session" />
 </LinearLayout>

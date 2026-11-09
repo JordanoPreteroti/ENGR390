@@ -14,6 +14,7 @@ import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @SuppressLint("MissingPermission")
-public class MainActivity extends AppCompatActivity {
+public class ConnectActivity extends AppCompatActivity {
 
     private static final String TAG = "Breathalyzer";
 
@@ -44,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID CCCD =
             UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
-    private TextView statusText, adcText, voltText, bacText, tempText, humText;
-    private Button connectButton;
+    private TextView statusText, batteryText, sensorText;
+    private Button connectButton, startButton;
 
     private BluetoothLeScanner scanner;
     private BluetoothGatt gatt;
@@ -56,8 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String[]> permissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
                     result -> {
-                        boolean allGranted = !result.containsValue(false);
-                        if (allGranted) {
+                        if (!result.containsValue(false)) {
                             startScan();
                         } else {
                             Toast.makeText(this, "Bluetooth permissions are required",
@@ -68,17 +68,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.connect_activity);
 
         statusText = findViewById(R.id.statusText);
-        adcText = findViewById(R.id.adcText);
-        voltText = findViewById(R.id.voltText);
-        bacText = findViewById(R.id.bacText);
-        tempText = findViewById(R.id.tempText);
-        humText = findViewById(R.id.humText);
+        batteryText = findViewById(R.id.batteryText);
+        sensorText = findViewById(R.id.sensorText);
         connectButton = findViewById(R.id.connectButton);
+        startButton = findViewById(R.id.startButton);
 
         connectButton.setOnClickListener(v -> ensurePermissions());
+        startButton.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfilesActivity.class)));
     }
 
     private void ensurePermissions() {
@@ -90,17 +90,13 @@ public class MainActivity extends AppCompatActivity {
             needed = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
         }
 
-        boolean missing = false;
         for (String p : needed) {
             if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
-                missing = true;
+                permissionLauncher.launch(needed);
+                return;
             }
         }
-        if (missing) {
-            permissionLauncher.launch(needed);
-        } else {
-            startScan();
-        }
+        startScan();
     }
 
     private void startScan() {
@@ -110,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Turn Bluetooth on first", Toast.LENGTH_LONG).show();
             return;
         }
+
         scanner = adapter.getBluetoothLeScanner();
         if (scanner == null || scanning) return;
 
@@ -140,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             if (name != null && name.toLowerCase().contains("bluno")) {
                 stopScan();
                 setStatus("Connecting...");
-                gatt = device.connectGatt(MainActivity.this, false, gattCallback,
+                gatt = device.connectGatt(ConnectActivity.this, false, gattCallback,
                         BluetoothDevice.TRANSPORT_LE);
             }
         }
@@ -153,10 +150,14 @@ public class MainActivity extends AppCompatActivity {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 g.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.w(TAG, "Disconnected, status=" + status);
                 g.close();
                 gatt = null;
-                setStatus("Disconnected (status " + status + ")");
+                setStatus("Disconnected");
+                runOnUiThread(() -> {
+                    startButton.setEnabled(false);
+                    sensorText.setText("Sensor: --");
+                    batteryText.setText("Device battery: --");
+                });
             }
         }
 
@@ -164,60 +165,58 @@ public class MainActivity extends AppCompatActivity {
         public void onServicesDiscovered(BluetoothGatt g, int status) {
             BluetoothGattService service = g.getService(SERIAL_SERVICE);
             if (service == null) {
-                setStatus("Serial service 0xDFB0 not found");
+                setStatus("Serial service not found");
                 return;
             }
             BluetoothGattCharacteristic ch = service.getCharacteristic(SERIAL_CHAR);
             if (ch == null) {
-                setStatus("Characteristic 0xDFB1 not found");
+                setStatus("Characteristic not found");
                 return;
             }
+
             g.setCharacteristicNotification(ch, true);
             BluetoothGattDescriptor cccd = ch.getDescriptor(CCCD);
             if (cccd != null) {
                 cccd.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 g.writeDescriptor(cccd);
             }
+
             setStatus("Connected");
+            runOnUiThread(() -> startButton.setEnabled(true));
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt g, BluetoothGattCharacteristic ch) {
             byte[] bytes = ch.getValue();
-            if (bytes == null) return;
-            handleBytes(new String(bytes, StandardCharsets.UTF_8));
+            if (bytes != null) {
+                handleBytes(new String(bytes, StandardCharsets.UTF_8));
+            }
         }
     };
 
     private void handleBytes(String chunk) {
         buffer.append(chunk);
-        int nl;
-        while ((nl = buffer.indexOf("\n")) >= 0) {
-            String line = buffer.substring(0, nl).trim();
-            buffer.delete(0, nl + 1);
+        int end;
+        while ((end = buffer.indexOf("\n")) >= 0) {
+            String line = buffer.substring(0, end).trim();
+            buffer.delete(0, end + 1);
             if (!line.isEmpty()) parseLine(line);
         }
     }
 
     private void parseLine(String line) {
-        String[] f = line.split(",");
-        if (f.length != 6) {
-            Log.w(TAG, "Ignoring malformed line: " + line);
+        String[] fields = line.split(",");
+        if (fields.length != 7) {
+            Log.w(TAG, "Malformed line: " + line);
             return;
         }
         try {
-            int raw = Integer.parseInt(f[0].trim());
-            float volts = Float.parseFloat(f[1].trim());
-            float estBac = Float.parseFloat(f[3].trim());
-            float temp = Float.parseFloat(f[4].trim());
-            float hum = Float.parseFloat(f[5].trim());
-
+            Integer.parseInt(fields[0].trim());
+            int battery = Integer.parseInt(fields[6].trim());
+            Log.d(TAG, "Packet: " + line);
             runOnUiThread(() -> {
-                adcText.setText("MQ-3 raw: " + raw);
-                voltText.setText(String.format("MQ-3 voltage: %.2f V", volts));
-                bacText.setText(String.format("Estimated BAC: %.4f", estBac));
-                tempText.setText(String.format("Temperature: %.1f °C", temp));
-                humText.setText(String.format("Humidity: %.1f %%", hum));
+                sensorText.setText("Sensor: OK");
+                batteryText.setText("Device battery: " + battery + "%");
             });
         } catch (NumberFormatException e) {
             Log.w(TAG, "Bad number in line: " + line);
