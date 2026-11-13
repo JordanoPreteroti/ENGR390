@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bz_teal">#4DB6AC</color>
+    <color name="bz_teal_light">#1F4F4A</color>
+    <color name="bz_teal_dark">#B2DFDB</color>
+    <color name="bz_grey">#A0A0A0</color>
+    <color name="bz_divider">#3A3A3A</color>
+    <color name="bz_red_dark">#EF5350</color>
+    <color name="bz_under_bg">#1B3A1E</color>
+    <color name="bz_under_text">#A5D6A7</color>
+    <color name="bz_caution_bg">#3D3200</color>
+    <color name="bz_caution_text">#FFE082</color>
+    <color name="bz_over_bg">#3E1A18</color>
+    <color name="bz_over_text">#EF9A9A</color>
+</resources>
