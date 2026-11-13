@@ -1,35 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Profiles: row is at least 56dp tall; order is edit, avatar, name, BAC + status label, dot -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
+    android:minHeight="56dp"
     android:orientation="horizontal"
     android:padding="12dp">
 
+    <!-- Profiles: edit button at the left edge -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEdit"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/edit_profile"
+        app:icon="@drawable/ic_edit" />
+
+    <!-- Profiles: avatar text 18sp, theme text color -->
     <TextView
         android:id="@+id/tvAvatar"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:background="@drawable/bz_avatar"
         android:gravity="center"
-        android:textColor="@color/bz_grey"
-        android:textSize="15sp" />
+        android:textSize="18sp" />
 
+    <!-- Profiles: name text 18sp -->
     <TextView
         android:id="@+id/tvName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/tvBac"
+    <!-- Profiles: BAC value with the status label stacked under it -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
-        android:textSize="15sp" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvBac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp" />
+
+        <!-- Profiles: status label so status is readable without color; maxWidth keeps the name readable -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="100dp"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <View
         android:id="@+id/vDot"

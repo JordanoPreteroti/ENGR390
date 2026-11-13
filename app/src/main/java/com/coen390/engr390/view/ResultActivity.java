@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.coen390.engr390.R;
 import com.coen390.engr390.controller.BACController;
@@ -18,7 +17,7 @@ import com.coen390.engr390.controller.BACController;
 import java.util.Locale;
 
 /** Screen (d): BAC result, driving status and time until sober. Shows (f) when needed. */
-public class ResultActivity extends AppCompatActivity {
+public class ResultActivity extends BaseActivity {
 
     public static final String EXTRA_NAME = "name";
     public static final String EXTRA_BAC = "bac";

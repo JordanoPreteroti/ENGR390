@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.coen390.engr390.R;
 import com.coen390.engr390.controller.DeviceService;
 import com.coen390.engr390.model.Reading;
@@ -14,7 +12,7 @@ import com.coen390.engr390.model.Reading;
 import java.util.Locale;
 
 /** Screen (a): connect to the breathalyzer over WiFi and start a session. */
-public class ConnectActivity extends AppCompatActivity implements DeviceService.Listener {
+public class ConnectActivity extends BaseActivity implements DeviceService.Listener {
 
     private DeviceService device;
 

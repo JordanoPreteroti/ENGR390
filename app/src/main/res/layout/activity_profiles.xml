@@ -10,38 +10,39 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- Profiles: bottom padding so the last row scrolls clear of the theme toggle -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvProfiles"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp" />
 
+        <!-- Profiles: hardcoded color removed so the theme applies -->
         <TextView
             android:id="@+id/tvEmpty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="No profiles yet. Add one to start."
-            android:textColor="@color/bz_grey"
             android:visibility="gone" />
     </FrameLayout>
 
+    <!-- Profiles: hardcoded tint and text color removed so the theme button style applies -->
     <Button
         android:id="@+id/btnAddProfile"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/bz_teal_light"
-        android:text="+ Add profile"
-        android:textColor="@color/bz_teal_dark" />
+        android:text="+ Add profile" />
 
+    <!-- Profiles: hardcoded tint and text color removed so the theme button style applies -->
     <Button
         android:id="@+id/btnLeaderboard"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/bz_button_tint"
-        android:text="Leaderboard"
-        android:textColor="@android:color/white" />
+        android:text="Leaderboard" />
 </LinearLayout>

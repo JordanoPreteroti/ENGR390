@@ -1,9 +1,57 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Shared by light and dark. -->
     <style name="Base.Theme.Engr390" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="materialButtonStyle">@style/Widget.Engr390.Button</item>
+        <item name="android:textViewStyle">@style/Widget.Engr390.TextView</item>
     </style>
 
-    <style name="Theme.Engr390" parent="Base.Theme.Engr390" />
+    <style name="Widget.Engr390.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.Engr390.TextView" parent="android:Widget.TextView">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Light: black on white. -->
+    <style name="Theme.Engr390" parent="Base.Theme.Engr390">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/black</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/black</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+        <item name="colorTertiary">@color/black</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/black</item>
+        <item name="colorOnTertiaryContainer">@color/white</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorSurfaceVariant">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/black</item>
+        <item name="colorSurfaceDim">@color/white</item>
+        <item name="colorSurfaceBright">@color/white</item>
+        <item name="colorSurfaceInverse">@color/black</item>
+        <item name="colorOnSurfaceInverse">@color/white</item>
+        <item name="colorSurfaceContainerLowest">@color/white</item>
+        <item name="colorSurfaceContainerLow">@color/white</item>
+        <item name="colorSurfaceContainer">@color/white</item>
+        <item name="colorSurfaceContainerHigh">@color/white</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
+        <item name="colorOutline">@color/black</item>
+        <item name="colorOutlineVariant">@color/black</item>
+        <item name="colorError">@color/black</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorErrorContainer">@color/black</item>
+        <item name="colorOnErrorContainer">@color/white</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
+    </style>
 </resources>

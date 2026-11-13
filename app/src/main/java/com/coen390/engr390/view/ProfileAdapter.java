@@ -22,6 +22,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.Holder> 
     public interface Listener {
         void onProfileClick(Profile profile);
         void onProfileLongClick(Profile profile);
+        // region Profiles: edit button callback
+        void onProfileEdit(Profile profile);
+        // endregion
     }
 
     private final List<Profile> profiles = new ArrayList<>();
@@ -52,9 +55,23 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.Holder> 
 
         h.tvAvatar.setText(p.getName().substring(0, 1).toUpperCase(Locale.ROOT));
         h.tvName.setText(p.getName());
-        h.tvBac.setText(StatusUi.formatBac(bac));
-        h.vDot.getBackground().mutate().setTint(
-                StatusUi.dotColor(h.itemView.getContext(), BACController.getStatus(bac)));
+        // region Profiles: BAC, status label and dot - "--" with no label or dot before the first test
+        boolean tested = p.getLastTestTime() != 0;
+        h.vDot.setVisibility(tested ? View.VISIBLE : View.INVISIBLE);
+        h.tvStatus.setVisibility(tested ? View.VISIBLE : View.GONE);
+        if (tested) {
+            h.tvBac.setText(StatusUi.formatBac(bac));
+            h.tvStatus.setText(StatusUi.label(BACController.getStatus(bac)));
+            h.vDot.getBackground().mutate().setTint(
+                    StatusUi.dotColor(h.itemView.getContext(), BACController.getStatus(bac)));
+        } else {
+            h.tvBac.setText(R.string.no_bac);
+        }
+        // endregion
+
+        // region Profiles: edit button
+        h.btnEdit.setOnClickListener(v -> listener.onProfileEdit(p));
+        // endregion
 
         h.itemView.setOnClickListener(v -> listener.onProfileClick(p));
         h.itemView.setOnLongClickListener(v -> {
@@ -73,9 +90,17 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.Holder> 
         final TextView tvName;
         final TextView tvBac;
         final View vDot;
+        // region Profiles: edit button and status label views
+        final View btnEdit;
+        final TextView tvStatus;
+        // endregion
 
         Holder(View v) {
             super(v);
+            // region Profiles: edit button and status label views
+            btnEdit = v.findViewById(R.id.btnEdit);
+            tvStatus = v.findViewById(R.id.tvStatus);
+            // endregion
             tvAvatar = v.findViewById(R.id.tvAvatar);
             tvName = v.findViewById(R.id.tvName);
             tvBac = v.findViewById(R.id.tvBac);

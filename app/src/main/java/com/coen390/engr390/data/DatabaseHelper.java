@@ -90,6 +90,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return getWritableDatabase().insert(TABLE_PROFILES, null, values);
     }
 
+    // region Profiles: edit - update only name, weight and sex; id, BAC and readings stay as they are
+    public void updateProfile(Profile profile) {
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, profile.getName());
+        values.put(COL_WEIGHT, profile.getWeightKg());
+        values.put(COL_SEX, profile.getSex());
+        getWritableDatabase().update(TABLE_PROFILES, values, COL_ID + " = ?",
+                new String[]{String.valueOf(profile.getId())});
+    }
+    // endregion
+
     public List<Profile> getAllProfiles() {
         return queryProfiles(COL_NAME + " COLLATE NOCASE ASC");
     }

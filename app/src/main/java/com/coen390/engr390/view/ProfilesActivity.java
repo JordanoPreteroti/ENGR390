@@ -46,7 +46,9 @@ public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Lis
 
         Button btnAdd = findViewById(R.id.btnAddProfile);
         Button btnLeaderboard = findViewById(R.id.btnLeaderboard);
-        btnAdd.setOnClickListener(v -> showAddProfileDialog());
+        // region Profiles: Add opens the shared add/edit dialog with no profile
+        btnAdd.setOnClickListener(v -> showProfileDialog(null));
+        // endregion
         btnLeaderboard.setOnClickListener(v ->
                 startActivity(new Intent(this, LeaderboardActivity.class)));
     }
@@ -83,16 +85,27 @@ public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Lis
                 .show();
     }
 
-    private void showAddProfileDialog() {
+    // region Profiles: add / edit dialog (existing == null adds, otherwise edits that profile)
+    @Override
+    public void onProfileEdit(Profile profile) {
+        showProfileDialog(profile);
+    }
+
+    private void showProfileDialog(Profile existing) {
         View form = getLayoutInflater().inflate(R.layout.dialog_add_profile, null);
         EditText etName = form.findViewById(R.id.etName);
         EditText etWeight = form.findViewById(R.id.etWeight);
         RadioGroup rgSex = form.findViewById(R.id.rgSex);
+        if (existing != null) {
+            etName.setText(existing.getName());
+            etWeight.setText(String.valueOf(existing.getWeightKg()));
+            rgSex.check("F".equals(existing.getSex()) ? R.id.rbFemale : R.id.rbMale);
+        }
 
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Add profile")
+                .setTitle(existing == null ? "Add profile" : getString(R.string.edit_profile))
                 .setView(form)
-                .setPositiveButton("Add", null) // set below so we can validate first
+                .setPositiveButton(existing == null ? "Add" : getString(R.string.save_profile), null) // set below so we can validate first
                 .setNegativeButton("Cancel", null)
                 .create();
 
@@ -116,12 +129,19 @@ public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Lis
                     }
                     String sex = rgSex.getCheckedRadioButtonId() == R.id.rbFemale ? "F" : "M";
 
-                    db.addProfile(name, weight, sex);
+                    if (existing == null) {
+                        db.addProfile(name, weight, sex);
+                    } else {
+                        db.updateProfile(new Profile(existing.getId(), name, weight, sex,
+                                existing.getLastBac(), existing.getLastTestTime(),
+                                existing.getPoints(), existing.getDrinks()));
+                    }
                     dialog.dismiss();
                     refresh();
                 }));
         dialog.show();
     }
+    // endregion
 
     @Override
     public boolean onSupportNavigateUp() {
