@@ -90,6 +90,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return getWritableDatabase().insert(TABLE_PROFILES, null, values);
     }
 
+    public int updateProfileWeight(long profileId, double weightKg) {
+        ContentValues values = new ContentValues();
+        values.put(COL_WEIGHT, weightKg);
+
+        return getWritableDatabase().update(
+                TABLE_PROFILES,
+                values,
+                COL_ID + " = ?",
+                new String[]{String.valueOf(profileId)}
+        );
+    }
+
+
     public List<Profile> getAllProfiles() {
         return queryProfiles(COL_NAME + " COLLATE NOCASE ASC");
     }

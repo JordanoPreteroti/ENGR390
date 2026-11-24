@@ -18,6 +18,7 @@ import com.coen390.engr390.data.DatabaseHelper;
 import com.coen390.engr390.model.Profile;
 
 import java.util.List;
+import android.widget.Toast;
 
 /** Screen (b): everyone in the group with their current BAC. */
 public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Listener {
@@ -70,8 +71,82 @@ public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Lis
         startActivity(i);
     }
 
+
     @Override
     public void onProfileLongClick(Profile profile) {
+        String[] options = {"Edit weight", "Delete profile"};
+
+        new AlertDialog.Builder(this)
+                .setTitle(profile.getName())
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        showEditWeightDialog(profile);
+                    } else {
+                        confirmDeleteProfile(profile);
+                    }
+                })
+                .show();
+    }
+
+
+    private void showEditWeightDialog(Profile profile) {
+        View form = getLayoutInflater()
+                .inflate(R.layout.dialog_edit_weight, null);
+
+        EditText etWeight = form.findViewById(R.id.etEditWeight);
+
+        // Show the user's current weight.
+        etWeight.setText(String.valueOf(profile.getWeightKg()));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Edit weight: " + profile.getName())
+                .setView(form)
+                .setPositiveButton("Save", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.setOnShowListener(d ->
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setOnClickListener(v -> {
+                            double weight;
+
+                            try {
+                                weight = Double.parseDouble(
+                                        etWeight.getText().toString().trim()
+                                );
+                            } catch (NumberFormatException e) {
+                                etWeight.setError("Enter a valid weight in kg");
+                                return;
+                            }
+
+                            if (!Double.isFinite(weight)
+                                    || weight < 30 || weight > 300) {
+                                etWeight.setError(
+                                        "Weight must be between 30 and 300 kg"
+                                );
+                                return;
+                            }
+
+                            int updated = db.updateProfileWeight(
+                                    profile.getId(), weight
+                            );
+
+                            if (updated != 1) {
+                                Toast.makeText(this,
+                                        "Could not update profile",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            dialog.dismiss();
+                            refresh();
+                        })
+        );
+
+        dialog.show();
+    }
+
+    private void confirmDeleteProfile(Profile profile) {
         new AlertDialog.Builder(this)
                 .setTitle("Delete " + profile.getName() + "?")
                 .setMessage("Their reading history will also be deleted.")
@@ -82,6 +157,8 @@ public class ProfilesActivity extends BaseActivity implements ProfileAdapter.Lis
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+
 
     private void showAddProfileDialog() {
         View form = getLayoutInflater().inflate(R.layout.dialog_add_profile, null);
